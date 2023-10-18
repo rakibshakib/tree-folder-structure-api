@@ -5,7 +5,7 @@ import config from "./config";
 async function serverStart() {
   try {
     await mongoose.connect(
-      "mongodb://localhost:27017/learningPortal" as string
+      "mongodb://localhost:27017/folderTree" as string
     );
     console.log("Database Connected....😃");
     app.listen(config.port, () => {
