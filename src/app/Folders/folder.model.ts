@@ -13,7 +13,7 @@ const folderSchema = new Schema<IfolderData>(
       required: true,
       unique: true,
     },
-    child: { type: [Array<IfolderData>], default: [] },
+    child:  [],
   },
   {
     timestamps: true,
@@ -22,6 +22,8 @@ const folderSchema = new Schema<IfolderData>(
     },
   }
 );
+
+folderSchema.add({ child: [folderSchema] });
 
 export const FolderTree = model<IfolderData, FolderModel>(
   "FolderTree",
