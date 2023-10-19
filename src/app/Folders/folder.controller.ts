@@ -42,39 +42,49 @@ const addChildNodeinParentNodeById: RequestHandler = async (
   const aggregationPipeline = [
     {
       $match: {
-        _id: new mongoose.Types.ObjectId("652fac319b75a20d12c129a2"), // Replace with the root node's _id
-      },
-    },
-    {
-      $graphLookup: {
-        from: "foldertrees", 
-        startWith: "$child",
-        connectFromField: "child",
-        connectToField: "_id",
-        as: "foundNode",
-        maxDepth: 10,
+        _id: id, // Replace with the root node's _id
       },
     },
     // {
+    //   $graphLookup: {
+    //     from: "foldertrees",
+    //     startWith: "$child",
+    //     connectFromField: "child",
+    //     connectToField: "_id",
+    //     as: "foundNode",
+    //     maxDepth: 10,
+    //   },
+    // },
+    // {
     //   $unwind: "$foundNode",
     // },
-    {
-      $match: {
-        "foundNode._id": new mongoose.Types.ObjectId(id),
-      },
-    },
+    // {
+    //   $match: {
+    //     "foundNode._id": "652fac319b75a20d12c129a2",
+    //   },
+    // },
   ];
 
-  const node = await FolderTree.aggregate(aggregationPipeline);
-  console.log({node}) 
+  // const node = await FolderTree.aggregate(aggregationPipeline);
+  // console.log({ node });
 
-/*   const parentId = "652fac319b75a20d12c129a2";
+  const parentId = "652fac319b75a20d12c129a2";
   const parentNode = await FolderTree.findById({ _id: parentId });
-  console.log({ parentNode });
+  // console.log({ parentNode });
   if (parentNode?.name === "Root" && parentNode._id === id) {
     parentNode?.child.push(newChild);
     await parentNode?.save();
   } else {
+    const updateNode = (child) => {
+      const index = child?.child.forEach((i) => i._id === id);
+      console.log(index)
+      // if (index === -1) {
+      //   child?.child?.forEach(updateNode);
+      // } else {
+      //   child?.child?.[index].child?.push(newChild);
+      // }
+    };
+    updateNode(parentNode)
     // const updateNode = (child: IfolderData) => {
     //   const index = child?.child.findIndex((i) => i.id === id);
     //   if (index === -1) {
@@ -84,11 +94,10 @@ const addChildNodeinParentNodeById: RequestHandler = async (
     //   }
     // };
 
-
     res.status(200).json("updated");
 
     // updateNode(updatedData);
-  } */
+  }
 
   res.status(200).json("created");
 };
