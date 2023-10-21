@@ -51,7 +51,6 @@ async function updateFolderById(
   newData: IfolderData
 ): Promise<IfolderData | null> {
   const root = await FolderTree.findById(rootNode);
-  console.log(root);
   if (!root) {
     return null; // Root node not found
   }
@@ -72,7 +71,7 @@ async function updateFolderById(
   };
 
   const updatedNode = await updateNode(root);
-  console.log({updatedNode})
+  console.log({ updatedNode });
   return updatedNode;
 }
 
@@ -87,20 +86,16 @@ const updateNodeFolder: RequestHandler = async (
     child: [],
     key: Date.now(),
   });
-  updateFolderById("653179d87dae277fc80a74a6", id, newChild)
-    .then((updatedNode) => {
-      console.log({ updatedNode });
-      if (updatedNode) {
-        console.log("Node updated:", updatedNode);
-        // await updatedNode?.save();
-      } else {
-        console.log("Node not found or could not be updated.");
-      }
-    })
-    .catch((error) => {
-      console.error("Error updating node:", error);
-    });
-  res.status(200).json("created");
+  const newFolder = await updateFolderById(
+    "653179d87dae277fc80a74a6",
+    id,
+    newChild
+  );
+  if (newFolder) {
+    res.status(200).json(newChild);
+  } else {
+    res.status(200).json("failed");
+  }
 };
 
 async function DeleteFolderById(
