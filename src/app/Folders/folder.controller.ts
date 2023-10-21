@@ -39,8 +39,9 @@ const addChildNodeinParentNodeById: RequestHandler = async (
     child: [],
     key: Date.now(),
   });
+    // localDB root id: 653179d87dae277fc80a74a6
   const newFolder = await FolderService.addChildNodeinParentNodeById(
-    "653179d87dae277fc80a74a6",
+    "6534118b68afc9c9ec415ecc", // host root id 
     id,
     newChild
   );
@@ -53,11 +54,12 @@ const addChildNodeinParentNodeById: RequestHandler = async (
 
 const deleteNodeById: RequestHandler = async (req: Request, res: Response) => {
   const { id } = req.body;
-  if (id === "653179d87dae277fc80a74a6") {
+  // localDB root id: 653179d87dae277fc80a74a6
+  if (id === "6534118b68afc9c9ec415ecc") { // host root id 
     return res.status(200).json("root can't be deleted");
   }
   const result = await FolderService.deleteNodeById(
-    "653179d87dae277fc80a74a6",
+    "6534118b68afc9c9ec415ecc",
     id
   );
   if (result) {
