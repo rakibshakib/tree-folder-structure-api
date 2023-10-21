@@ -1,7 +1,6 @@
 import { Request, RequestHandler, Response } from "express";
 import { FolderTree } from "./folder.model";
-import { FolderModel, IfolderData } from "./folder.interface";
-import mongoose from "mongoose";
+import { IfolderData } from "./folder.interface";
 
 const getAllFolderNode: RequestHandler = async (
   req: Request,
@@ -43,67 +42,6 @@ const addChildNodeinParentNodeById: RequestHandler = async (
   const parentNode = await FolderTree.findById({ _id: id });
   parentNode?.child.push(newChild);
   await parentNode?.save();
-
-  // const aggregationPipeline = [
-  //   {
-  //     $match: {
-  //       _id: id, // Replace with the root node's _id
-  //     },
-  //   },
-  //   // {
-  //   //   $graphLookup: {
-  //   //     from: "foldertrees",
-  //   //     startWith: "$child",
-  //   //     connectFromField: "child",
-  //   //     connectToField: "_id",
-  //   //     as: "foundNode",
-  //   //     maxDepth: 10,
-  //   //   },
-  //   // },
-  //   // {
-  //   //   $unwind: "$foundNode",
-  //   // },
-  //   // {
-  //   //   $match: {
-  //   //     "foundNode._id": "652fac319b75a20d12c129a2",
-  //   //   },
-  //   // },
-  // ];
-
-  // // const node = await FolderTree.aggregate(aggregationPipeline);
-  // // console.log({ node });
-
-  // const parentId = "652fac319b75a20d12c129a2";
-  // const parentNode = await FolderTree.findById({ _id: parentId });
-  // // console.log({ parentNode });
-  // if (parentNode?.name === "Root" && parentNode._id === id) {
-  //   parentNode?.child.push(newChild);
-  //   await parentNode?.save();
-  // } else {
-  //   const updateNode = (child) => {
-  //     const index = child?.child.forEach((i) => i._id === id);
-  //     console.log(index)
-  //     // if (index === -1) {
-  //     //   child?.child?.forEach(updateNode);
-  //     // } else {
-  //     //   child?.child?.[index].child?.push(newChild);
-  //     // }
-  //   };
-  //   updateNode(parentNode)
-  //   // const updateNode = (child: IfolderData) => {
-  //   //   const index = child?.child.findIndex((i) => i.id === id);
-  //   //   if (index === -1) {
-  //   //     child.child.forEach(updateNode);
-  //   //   } else {
-  //   //     (child?.child[index].child as TreeNode[]).push(newObject);
-  //   //   }
-  //   // };
-
-  //   res.status(200).json("updated");
-
-  // updateNode(updatedData);
-  // }
-
   res.status(200).json("created");
 };
 
@@ -112,7 +50,6 @@ async function updateFolderById(
   nodeId: string,
   newData: IfolderData
 ): Promise<IfolderData | null> {
-  console.log(newData, "new data need to push");
   const root = await FolderTree.findById(rootNode);
   console.log(root);
   if (!root) {
@@ -126,18 +63,16 @@ async function updateFolderById(
       // await node.save();
       // root.deleteOne()
       await root.save();
+      console.log("on update", node);
       return node;
     } else {
-      // for (let i = 0; i < node.child.length; i++) {
-      //   const updatedChild = await updateNode(node.child[i]);
-      //   if (updatedChild) return updatedChild;
-      // }
       node.child.forEach((childAsNode) => updateNode(childAsNode));
     }
-    return null;
+    return node;
   };
 
   const updatedNode = await updateNode(root);
+  console.log({updatedNode})
   return updatedNode;
 }
 
@@ -154,6 +89,7 @@ const updateNodeFolder: RequestHandler = async (
   });
   updateFolderById("653179d87dae277fc80a74a6", id, newChild)
     .then((updatedNode) => {
+      console.log({ updatedNode });
       if (updatedNode) {
         console.log("Node updated:", updatedNode);
         // await updatedNode?.save();
@@ -171,7 +107,6 @@ async function DeleteFolderById(
   rootNode: string,
   nodeId: string
 ): Promise<IfolderData | boolean> {
-
   const root = await FolderTree.findById(rootNode);
   if (!root) {
     return false; // Root node not found
@@ -190,13 +125,11 @@ async function DeleteFolderById(
     return false;
   };
 
-
-
   const deleted = await updateNode(root);
   return deleted;
 }
 const deleteNodeById: RequestHandler = async (req: Request, res: Response) => {
-  const { id, name } = req.body;
+  const { id } = req.body;
   DeleteFolderById("653179d87dae277fc80a74a6", id)
     .then((deletedNode) => {
       if (deletedNode) {
